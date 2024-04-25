@@ -1,7 +1,41 @@
 #root {
   /* max-width: 1280px; */
+  width: 100%;
   margin: 0 auto;
   /* padding: 2rem; */
   text-align: center;
+  align-items: center;
+  justify-content: center;
 }
 
+.main-container {
+  display: flex;
+  justify-content: center; 
+  align-items: center;
+  margin: 1rem auto;
+}
+
+.app-container {
+  display: flex;
+  align-items: flex-start;
+  height: 80vh;
+  width: 80vw;
+  margin: 10px;
+}
+
+.sidebar {
+  width: 25%;
+  background-color: #f1f1f1;
+  margin: 1rem auto;
+}
+
+.map-div {
+  flex-grow: 1; 
+  margin-left: 20px;
+  width: 75%;
+}
+
+h1 {
+  margin: 0; 
+  padding: 10px;
+}
