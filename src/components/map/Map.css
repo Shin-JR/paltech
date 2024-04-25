@@ -1,0 +1,8 @@
+.map-container {
+  height: 80vh; /* Altura del contenedor del mapa */
+  width: 80vw;   /* Ancho del contenedor del mapa */
+  margin: 1rem auto; /* Centrar el contenedor horizontalmente */
+  max-width: 1200px;
+  max-height: 800px;
+  border: 1px solid whitesmoke; /* Borde del contenedor */
+}
