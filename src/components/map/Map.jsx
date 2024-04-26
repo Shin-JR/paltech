@@ -1,34 +1,39 @@
+/* eslint-disable react/prop-types */
 // import React from "react";
-import { MapContainer, TileLayer, Marker, Popup, FeatureGroup } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  FeatureGroup,
+} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import "./Map.css";
 import { useState } from "react";
 import "leaflet-draw/dist/leaflet.draw.css";
-import {EditControl} from "react-leaflet-draw";
+import { EditControl } from "react-leaflet-draw";
+import { useMapEvents } from "react-leaflet";
+import { useEffect } from "react";
 
 // based on https://github.com/codegeous/react-component-depot/blob/master/src/pages/Leaflet/polygon.js
-export default function Map({geofences, setGeofences}) {
-  const [center, setCenter] = useState([-33.4372, -70.6506])
-  // const [center, setCenter] = useState([47.7364, 10.3235])
+export default function Map({ geofences, setGeofences }) {
+  const [center, setCenter] = useState([-33.4372, -70.6506]);
+  const [markers, setMarkers] = useState([]);
   const ZOOM_LEVEL = 15;
 
-  const _onMapClick = (e) => {
-    const { latlng } = e;
-    
-    // Verificar si el clic está dentro de algún geofence
-    const isInsideGeofence = geofences.some((geofence) => {
-      const polygon = L.polygon(geofence.latlngs);
-      return polygon.contains(latlng);
-    });
+  /////
+  // const [initialPosition, setInitialPosition] =
+  //   useState([0, 0]);
+  // const [selectedPosition, setSelectedPosition] =
+  //   useState([0, 0]);
 
-    if (isInsideGeofence) {
-      // Permitir agregar el marcador
-      // Aquí puedes agregar lógica para agregar el marcador en el estado o hacer lo que necesites
-      console.log("Dentro de un geofence");
-    } else {
-      console.log("Fuera de un geofence");
-    }
-  };
+  // useEffect(() => {
+  //   navigator.geolocation.getCurrentPosition((position) => {
+  //     const { latitude, longitude } = position.coords;
+  //     setInitialPosition([latitude, longitude]);
+  //   });
+  // }, []);
+  /////
 
   const _onCreated = (e) => {
     // console.log(e);
@@ -72,13 +77,35 @@ export default function Map({geofences, setGeofences}) {
     });
   };
 
+  // const _addMarker = (e) => {
+  //   const { latlng } = e;
+  //   console.log(latlng);
+  //   // setMarkers((prevMarkers) => [...prevMarkers, latlng]);
+  // };
+
+  // const Markers = () => {
+  //   useMapEvents({
+  //     click(e) {
+  //       setMarkers((prevMarkers) => [...prevMarkers, e.latlng]);
+  //       // setSelectedPosition([e.latlng.lat, e.latlng.lng]);
+  //     },
+  //   });
+
+  //   return (
+  //       markers.map((marker, index) => (
+  //         <Marker key={index} position={marker} interactive={false}>
+  //           <Popup>Marker {index}</Popup>
+  //         </Marker>
+  //       ))
+  //   )
+  // };
+
   return (
     <div className="map-container">
       <MapContainer
-        center={ center }
+        center={center}
         zoom={ZOOM_LEVEL}
-        style={{ height: "100%"}}
-        onClick={_onMapClick}
+        style={{ height: "100%" }}
       >
         <FeatureGroup>
           <EditControl
@@ -96,25 +123,20 @@ export default function Map({geofences, setGeofences}) {
                 allowIntersection: true,
                 drawError: {
                   color: "#F1F100",
-                  message: "<strong>Oh snap!</strong> you can't draw that!"
+                  message: "<strong>Oh snap!</strong> you can't draw that!",
                 },
                 shapeOptions: {
-                  color: "#97009c"
-                }
-              }
-            }
-            }
+                  color: "#97009c",
+                },
+              },
+            }}
           />
         </FeatureGroup>
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <Marker position={center}>
-          <Popup>
-            Paltech
-          </Popup>
-        </Marker>
+        {/* <Markers /> */}
       </MapContainer>
     </div>
   );
