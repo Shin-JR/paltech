@@ -4,3 +4,68 @@
     justify-content: center;
     margin: 1rem auto;
 }
+
+.add-markers-button {
+    margin: 0.5rem auto;
+    padding: 0.5rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f0f0f0;
+    color: #333;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.add-markers-button:hover {
+    background-color: #e0e0e0;
+}
+
+.add-markers-button-active {
+  background-color: rgba(28, 238, 0, 0.679);
+}
+
+.delete-markers-button {
+    margin: 0.5rem auto;
+    padding: 0.5rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f62424;
+    color: whitesmoke;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.delete-markers-button:hover {
+    background-color: #e03c3ca8;
+}
+
+.alert-message {
+    margin: 1rem auto;
+    padding: 0.5rem 1rem;
+    border-top: 1px solid #ff0000;
+    border-bottom: 1px solid #ff0000;
+    background-color: #f0f0f0;
+    color: #333;
+    font-size: 1rem;
+    text-align: center;
+}
+
+.download-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 1rem auto;
+    margin-top: 2rem;
+
+}
+
+.download-button {
+    margin: 0.5rem auto;
+    padding: 0.5rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f0f0f0;
+    color: #333;
+    font-size: 1rem;
+    cursor: pointer;
+}
