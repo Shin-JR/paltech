@@ -61,7 +61,7 @@ export default function Map({
   // map marker
   const markerIcon = L.icon({
     iconUrl: "/marker/map-pin.svg",
-    iconSize: [30, 30],
+    iconSize: [35, 35],
   });
 
   const handleMarkersInsideGeofence = () => {
