@@ -60,8 +60,7 @@ export default function Map({
 
   // map marker
   const markerIcon = L.icon({
-    iconUrl:
-      "/marker/map-pin.svg", 
+    iconUrl: "/marker/map-pin.svg",
     iconSize: [30, 30],
   });
 
