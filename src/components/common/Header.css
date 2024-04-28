@@ -2,9 +2,7 @@
   background-color: #517330;
   padding: 1rem 2rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  /* position: sticky; */
-  top: 0;
-  /* width: 100%; */
+  position: sticky;
   z-index: 1000;
 }
 

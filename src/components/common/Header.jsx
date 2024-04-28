@@ -16,9 +16,6 @@ export default function Header() {
             <a href="/howtouse" className="nav-link">
               How To Use
             </a>
-            <a href="/answers" className="nav-link">
-              Answers
-            </a>
           </nav>
         </div>
       </div>

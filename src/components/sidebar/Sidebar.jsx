@@ -1,5 +1,4 @@
 /* eslint-disable react/prop-types */
-import { useState } from "react";
 import "./Sidebar.css";
 import Modes from "../../config/Modes";
 
@@ -38,7 +37,10 @@ export default function Sidebar({
   const downloadFile = ({ fileName, fileType }) => {
     const data = {
       geofences: geofences,
-      markers: markers,
+      markers: markers.map((marker) => ({
+        lat: marker.position.lat,
+        lng: marker.position.lng,
+      })),
       keepOutZones: keepOutZones,
     };
     const json = JSON.stringify(data, null, 2);
@@ -67,15 +69,14 @@ export default function Sidebar({
 
   return (
     <>
-      <p>{mode}</p>
-      <p>{JSON.stringify(markers, null, 2)}</p>
+      {/* <p>{ JSON.stringify(geofences, null, 2)}</p> */}
       <h2>GeoFences & Markers</h2>
-      <h3>Mode: {mode === Modes.MARKERS ? "Markers" : "Geofences"}</h3>
+      {/* <h3>Mode: {mode === Modes.MARKERS ? "Markers" : "Geofences"}</h3> */}
       <div className="button-container">
         <div className="mode-buttons-container">
           <button
             className={`add-markers-button ${
-              (mode === Modes.GEOFENCES || mode === Modes.KEEP_OUT_ZONES)
+              mode === Modes.GEOFENCES || mode === Modes.KEEP_OUT_ZONES
                 ? "add-markers-button-active"
                 : ""
             }`}
@@ -85,7 +86,9 @@ export default function Sidebar({
           </button>
           <button
             className={`add-markers-button ${
-              (mode === Modes.MARKERS || mode === Modes.DELETE_MARKERS) ? "add-markers-button-active" : ""
+              mode === Modes.MARKERS || mode === Modes.DELETE_MARKERS
+                ? "add-markers-button-active"
+                : ""
             }`}
             onClick={handleMarkerButtonAction}
           >

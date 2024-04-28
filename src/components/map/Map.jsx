@@ -51,32 +51,61 @@ export default function Map({
   keepOutZones,
   setKeepOutZones,
 }) {
-  const [center, setCenter] = useState([-33.4372, -70.6506]);
+  const center = [47.736008114450414, 10.32336067054073];
   const [prevSelectedGeofence, setPrevSelectedGeofence] = useState(null);
   const [geofenceColor, setGeofenceColor] = useState(Colors.GEOFENCES);
   const featureGroupRef = useRef();
   const ZOOM_LEVEL = 15;
 
   const handleMarkersInsideGeofence = () => {
-    const markersInsideGeofence = markers.filter((marker) => {
-      const insideGeofence = geofences.some((geofence) => {
-        const latlngs = geofence.latlngs.map((point) => [point.lat, point.lng]);
-        return inside([marker.position.lat, marker.position.lng], latlngs);
-      });
+    let markersInsideGeofence = [];
+    if (featureGroupRef.current) {
+      const { _layers } = featureGroupRef.current;
+      const geofencesArray = [];
+      Object.values(_layers).forEach((layer) => {
+        const color = layer.options.color;
+        const id = layer._leaflet_id;
+        const latlngs = layer.getLatLngs()[0];
 
-      return insideGeofence;
-    });
+        if (color === Colors.GEOFENCES || color === Colors.SELECTED_GEOFENCE) {
+          geofencesArray.push({ id, latlngs });
+        }
+      });
+      markersInsideGeofence = markers.filter((marker) => {
+        const insideGeofence = geofencesArray.some((geofence) => {
+          const latlngs = geofence.latlngs.map((point) => [
+            point.lat,
+            point.lng,
+          ]);
+          return inside([marker.position.lat, marker.position.lng], latlngs);
+        });
+        return insideGeofence;
+      });
+    } else {
+      markersInsideGeofence = markers.filter((marker) => {
+        const insideGeofence = geofences.some((geofence) => {
+          const latlngs = geofence.latlngs.map((point) => [
+            point.lat,
+            point.lng,
+          ]);
+          return inside([marker.position.lat, marker.position.lng], latlngs);
+        });
+
+        return insideGeofence;
+      });
+    }
+
     setMarkers(markersInsideGeofence);
   };
 
   const handleDeleteMarkers = (marker_selected) => {
-    // console.log("Deleting marker with id: ", marker_selected.id);
     if (mode !== Modes.DELETE_MARKERS) {
-      console.log("not removing")
       return;
     }
     setMarkers((prevMarkers) =>
-      prevMarkers.filter((marker) => marker.position !== marker_selected.position)
+      prevMarkers.filter(
+        (marker) => marker.position !== marker_selected.position
+      )
     );
     setAlertMessage("Marker Removed!");
   };
@@ -91,7 +120,7 @@ export default function Map({
       const id = layer._leaflet_id;
       const latlngs = layer.getLatLngs()[0];
 
-      if (color === Colors.GEOFENCES) {
+      if (color === Colors.GEOFENCES || color === Colors.SELECTED_GEOFENCE) {
         geofencesArray.push({ id, latlngs });
       } else if (color === Colors.KEEP_OUT_ZONES) {
         keepOutZonesArray.push({ id, latlngs });
@@ -102,21 +131,7 @@ export default function Map({
     setKeepOutZones(keepOutZonesArray.reverse());
   };
 
-  useEffect(() => {
-    if (mode === Modes.GEOFENCES) {
-      setGeofenceColor(Colors.GEOFENCES);
-    } else if (mode === Modes.KEEP_OUT_ZONES) {
-      setGeofenceColor(Colors.KEEP_OUT_ZONES);
-    }
-  }, [mode]);
-
-  useEffect(() => {
-    handleMarkersInsideGeofence();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [geofences]);
-
   const _onCreated = (e) => {
-    // console.log(e);
     const { layerType, layer } = e;
     const layerColor = layer.options.color;
     if (layerType === "polygon") {
@@ -171,14 +186,31 @@ export default function Map({
         const clickCoords = [e.latlng.lat, e.latlng.lng];
         if (mode === Modes.MARKERS) {
           handleGeofencesArray();
-          const insideGeofence = geofences.some((geofence) => {
+          const { _layers } = featureGroupRef.current;
+          const geofencesArray = [];
+          const keepOutZonesArray = [];
+          Object.values(_layers).forEach((layer) => {
+            const color = layer.options.color;
+            const id = layer._leaflet_id;
+            const latlngs = layer.getLatLngs()[0];
+
+            if (
+              color === Colors.GEOFENCES ||
+              color === Colors.SELECTED_GEOFENCE
+            ) {
+              geofencesArray.push({ id, latlngs });
+            } else if (color === Colors.KEEP_OUT_ZONES) {
+              keepOutZonesArray.push({ id, latlngs });
+            }
+          });
+          const insideGeofence = geofencesArray.some((geofence) => {
             const latlngs = geofence.latlngs.map((point) => [
               point.lat,
               point.lng,
             ]);
             return inside(clickCoords, latlngs);
           });
-          const insideKeepOutZone = keepOutZones.some((geofence) => {
+          const insideKeepOutZone = keepOutZonesArray.some((geofence) => {
             const latlngs = geofence.latlngs.map((point) => [
               point.lat,
               point.lng,
@@ -187,7 +219,6 @@ export default function Map({
           });
 
           if (insideGeofence && !insideKeepOutZone) {
-            // console.log({ id: JSON.stringify(e.latlng), position: e.latlng });
             setMarkers((prevMarkers) => [
               ...prevMarkers,
               { id: JSON.stringify(e.latlng), position: e.latlng },
@@ -205,13 +236,29 @@ export default function Map({
         } else if (mode === Modes.GEOFENCES || mode === Modes.KEEP_OUT_ZONES) {
           const clickCoords = [e.latlng.lat, e.latlng.lng];
           if (mode === Modes.GEOFENCES) {
-            const clickedGeofence = geofences.find((geofence) => {
-              const latlngs = geofence.latlngs.map((point) => [
-                point.lat,
-                point.lng,
-              ]);
-              return inside(clickCoords, latlngs);
+            const { _layers } = featureGroupRef.current;
+            const geofencesArray = [];
+            Object.values(_layers).forEach((layer) => {
+              const color = layer.options.color;
+              const id = layer._leaflet_id;
+              const latlngs = layer.getLatLngs()[0];
+
+              if (
+                color === Colors.GEOFENCES ||
+                color === Colors.SELECTED_GEOFENCE
+              ) {
+                geofencesArray.push({ id, latlngs });
+              }
             });
+            const clickedGeofence = geofencesArray
+              .reverse()
+              .find((geofence) => {
+                const latlngs = geofence.latlngs.map((point) => [
+                  point.lat,
+                  point.lng,
+                ]);
+                return inside(clickCoords, latlngs);
+              });
 
             if (clickedGeofence) {
               const { _layers } = featureGroupRef.current;
@@ -243,6 +290,19 @@ export default function Map({
       </>
     );
   };
+
+  useEffect(() => {
+    if (mode === Modes.GEOFENCES) {
+      setGeofenceColor(Colors.GEOFENCES);
+    } else if (mode === Modes.KEEP_OUT_ZONES) {
+      setGeofenceColor(Colors.KEEP_OUT_ZONES);
+    }
+  }, [mode]);
+
+  useEffect(() => {
+    handleMarkersInsideGeofence();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [geofences]);
 
   return (
     <div className="map-container">
