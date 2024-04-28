@@ -10,6 +10,7 @@ import { useMapEvents } from "react-leaflet";
 import { useEffect } from "react";
 import { useRef } from "react";
 import Modes from "../../config/Modes";
+import L from "leaflet";
 
 // https://stackoverflow.com/questions/22521982/check-if-point-is-inside-a-polygon
 function inside(point, vs) {
@@ -56,6 +57,13 @@ export default function Map({
   const [geofenceColor, setGeofenceColor] = useState(Colors.GEOFENCES);
   const featureGroupRef = useRef();
   const ZOOM_LEVEL = 15;
+
+  // map marker
+  const markerIcon = L.icon({
+    iconUrl:
+      "/marker/map-pin.svg", 
+    iconSize: [30, 30],
+  });
 
   const handleMarkersInsideGeofence = () => {
     let markersInsideGeofence = [];
@@ -282,6 +290,7 @@ export default function Map({
           <Marker
             key={index}
             position={marker.position}
+            icon={markerIcon}
             eventHandlers={{
               click: () => handleDeleteMarkers(marker),
             }}

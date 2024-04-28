@@ -7,7 +7,7 @@ export default function Header() {
       <div className="container">
         <div className="header-inner">
           <div className="logo">
-            <img src="/Paltech_white_small.png" alt="paltech-logo" />
+            <img src="/logos/Paltech_white_small.png" alt="paltech-logo" />
           </div>
           <nav className="nav">
             <a href="/" className="nav-link">
