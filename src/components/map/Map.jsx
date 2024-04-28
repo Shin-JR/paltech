@@ -8,6 +8,8 @@ import "leaflet-draw/dist/leaflet.draw.css";
 import { EditControl } from "react-leaflet-draw";
 import { useMapEvents } from "react-leaflet";
 import { useEffect } from "react";
+import { useRef } from "react";
+import Modes from "../../config/Modes";
 
 // https://stackoverflow.com/questions/22521982/check-if-point-is-inside-a-polygon
 function inside(point, vs) {
@@ -32,9 +34,10 @@ function inside(point, vs) {
   return inside;
 }
 
-const Modes = Object.freeze({
-  GEOFENCES: 0,
-  MARKERS: 1,
+const Colors = Object.freeze({
+  GEOFENCES: "#97009c",
+  SELECTED_GEOFENCE: "red",
+  KEEP_OUT_ZONES: "black",
 });
 
 // based on https://github.com/codegeous/react-component-depot/blob/master/src/pages/Leaflet/polygon.js
@@ -44,40 +47,94 @@ export default function Map({
   geofences,
   setGeofences,
   mode,
-  setMode,
-  alertMessage,
   setAlertMessage,
+  keepOutZones,
+  setKeepOutZones,
 }) {
   const [center, setCenter] = useState([-33.4372, -70.6506]);
-  const [selectedGeofence, setSelectedGeofence] = useState(null);
-  const [selectedGeofenceColor, setSelectedGeofenceColor] = useState("black");
+  const [prevSelectedGeofence, setPrevSelectedGeofence] = useState(null);
+  const [geofenceColor, setGeofenceColor] = useState(Colors.GEOFENCES);
+  const featureGroupRef = useRef();
   const ZOOM_LEVEL = 15;
 
   const handleMarkersInsideGeofence = () => {
     const markersInsideGeofence = markers.filter((marker) => {
       const insideGeofence = geofences.some((geofence) => {
         const latlngs = geofence.latlngs.map((point) => [point.lat, point.lng]);
-        return inside([marker.lat, marker.lng], latlngs);
+        return inside([marker.position.lat, marker.position.lng], latlngs);
       });
 
       return insideGeofence;
     });
     setMarkers(markersInsideGeofence);
   };
-  
+
+  const handleDeleteMarkers = (marker_selected) => {
+    // console.log("Deleting marker with id: ", marker_selected.id);
+    if (mode !== Modes.DELETE_MARKERS) {
+      console.log("not removing")
+      return;
+    }
+    setMarkers((prevMarkers) =>
+      prevMarkers.filter((marker) => marker.position !== marker_selected.position)
+    );
+    setAlertMessage("Marker Removed!");
+  };
+
+  const handleGeofencesArray = () => {
+    const { _layers } = featureGroupRef.current;
+    const geofencesArray = [];
+    const keepOutZonesArray = [];
+
+    Object.values(_layers).forEach((layer) => {
+      const color = layer.options.color;
+      const id = layer._leaflet_id;
+      const latlngs = layer.getLatLngs()[0];
+
+      if (color === Colors.GEOFENCES) {
+        geofencesArray.push({ id, latlngs });
+      } else if (color === Colors.KEEP_OUT_ZONES) {
+        keepOutZonesArray.push({ id, latlngs });
+      }
+    });
+
+    setGeofences(geofencesArray.reverse());
+    setKeepOutZones(keepOutZonesArray.reverse());
+  };
+
+  useEffect(() => {
+    if (mode === Modes.GEOFENCES) {
+      setGeofenceColor(Colors.GEOFENCES);
+    } else if (mode === Modes.KEEP_OUT_ZONES) {
+      setGeofenceColor(Colors.KEEP_OUT_ZONES);
+    }
+  }, [mode]);
+
   useEffect(() => {
     handleMarkersInsideGeofence();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [geofences]);
 
   const _onCreated = (e) => {
+    // console.log(e);
     const { layerType, layer } = e;
+    const layerColor = layer.options.color;
     if (layerType === "polygon") {
       const { _leaflet_id } = layer;
-      setGeofences((layers) => [
-        { id: _leaflet_id, latlngs: layer.getLatLngs()[0] },
-        ...layers,
-      ]);
-      setAlertMessage("Geofence Created!");
+
+      if (layerColor === Colors.KEEP_OUT_ZONES) {
+        setKeepOutZones((layers) => [
+          { id: _leaflet_id, latlngs: layer.getLatLngs()[0] },
+          ...layers,
+        ]);
+        setAlertMessage("Keep Out Zone Created!");
+      } else if (layerColor === Colors.GEOFENCES) {
+        setGeofences((layers) => [
+          { id: _leaflet_id, latlngs: layer.getLatLngs()[0] },
+          ...layers,
+        ]);
+        setAlertMessage("Geofence Created!");
+      }
     }
   };
 
@@ -113,6 +170,7 @@ export default function Map({
       click(e) {
         const clickCoords = [e.latlng.lat, e.latlng.lng];
         if (mode === Modes.MARKERS) {
+          handleGeofencesArray();
           const insideGeofence = geofences.some((geofence) => {
             const latlngs = geofence.latlngs.map((point) => [
               point.lat,
@@ -120,36 +178,53 @@ export default function Map({
             ]);
             return inside(clickCoords, latlngs);
           });
-
-          const geofenceCount = geofences.filter((geofence) => {
-            const latlngs = geofence.latlngs.map((point) => [
-              point.lat,
-              point.lng,
-            ]);
-            return inside(clickCoords, latlngs);
-          }).length;
-          if (insideGeofence && geofenceCount % 2 == 1) {
-            setMarkers((prevMarkers) => [...prevMarkers, e.latlng]);
-            setAlertMessage("Marker Added!");
-          } else if (insideGeofence && geofenceCount % 2 == 0) {
-            setAlertMessage(
-              "You are in a red zone, you can't add a marker here."
-            );
-          } else {
-            setAlertMessage(
-              "Out of a Geofence!\nYou have to be inside a Geofence to add a marker."
-            );
-          }
-        } else if (mode === Modes.GEOFENCES) {
-          // Add selection of geofence feature
-          // Add red zone feature
-          const clickedGeofence = geofences.find((geofence) => {
+          const insideKeepOutZone = keepOutZones.some((geofence) => {
             const latlngs = geofence.latlngs.map((point) => [
               point.lat,
               point.lng,
             ]);
             return inside(clickCoords, latlngs);
           });
+
+          if (insideGeofence && !insideKeepOutZone) {
+            // console.log({ id: JSON.stringify(e.latlng), position: e.latlng });
+            setMarkers((prevMarkers) => [
+              ...prevMarkers,
+              { id: JSON.stringify(e.latlng), position: e.latlng },
+            ]);
+            setAlertMessage("Marker Added!");
+          } else if (insideKeepOutZone) {
+            setAlertMessage(
+              "You are in a keep out zone, you can't add a marker here."
+            );
+          } else {
+            setAlertMessage(
+              "Out of a Geofence!\nYou have to be inside a Geofence to add a marker."
+            );
+          }
+        } else if (mode === Modes.GEOFENCES || mode === Modes.KEEP_OUT_ZONES) {
+          const clickCoords = [e.latlng.lat, e.latlng.lng];
+          if (mode === Modes.GEOFENCES) {
+            const clickedGeofence = geofences.find((geofence) => {
+              const latlngs = geofence.latlngs.map((point) => [
+                point.lat,
+                point.lng,
+              ]);
+              return inside(clickCoords, latlngs);
+            });
+
+            if (clickedGeofence) {
+              const { _layers } = featureGroupRef.current;
+              const clickedLayer = _layers[clickedGeofence.id];
+              if (prevSelectedGeofence) {
+                prevSelectedGeofence.setStyle({ color: Colors.GEOFENCES });
+              }
+              if (clickedLayer) {
+                clickedLayer.setStyle({ color: Colors.SELECTED_GEOFENCE });
+                setPrevSelectedGeofence(clickedLayer);
+              }
+            }
+          }
         }
       },
     });
@@ -157,7 +232,13 @@ export default function Map({
     return (
       <>
         {markers.map((marker, index) => (
-          <Marker key={index} position={marker} interactive={false}></Marker>
+          <Marker
+            key={index}
+            position={marker.position}
+            eventHandlers={{
+              click: () => handleDeleteMarkers(marker),
+            }}
+          ></Marker>
         ))}
       </>
     );
@@ -170,7 +251,7 @@ export default function Map({
         zoom={ZOOM_LEVEL}
         style={{ height: "100%" }}
       >
-        <FeatureGroup>
+        <FeatureGroup ref={featureGroupRef}>
           <EditControl
             position="topright"
             onCreated={_onCreated}
@@ -189,7 +270,7 @@ export default function Map({
                   message: "<strong>Oh snap!</strong> you can't draw that!",
                 },
                 shapeOptions: {
-                  color: selectedGeofenceColor,
+                  color: geofenceColor,
                 },
               },
             }}

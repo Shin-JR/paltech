@@ -14,6 +14,7 @@
     color: #333;
     font-size: 1rem;
     cursor: pointer;
+
 }
 
 .add-markers-button:hover {
@@ -21,7 +22,27 @@
 }
 
 .add-markers-button-active {
-  background-color: rgba(28, 238, 0, 0.679);
+  background-color: #07B120;
+}
+
+.add-keepoutzones-button {
+    margin: 0.5rem auto;
+    padding: 0.5rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f0f0f0;
+    color: #333;
+    font-size: 1rem;
+    cursor: pointer;
+
+}
+
+.add-keepoutzones-button:hover {
+    background-color: #e0e0e0;
+}
+
+.add-keepoutzones-button-active {
+  background-color: #22f642;
 }
 
 .delete-markers-button {
@@ -68,4 +89,12 @@
     color: #333;
     font-size: 1rem;
     cursor: pointer;
+}
+
+.geofence-menu {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 1rem auto;
+    border: 1px solid #ccc;
 }

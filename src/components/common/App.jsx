@@ -5,6 +5,7 @@ import { useState } from "react";
 
 function App() {
   const [geofences, setGeofences] = useState([]);
+  const [keepOutZones, setKeepOutZones] = useState([]);
   const [mode, setMode] = useState(0);
   const [markers, setMarkers] = useState([]);
   const [alertMessage, setAlertMessage] = useState("");
@@ -21,6 +22,7 @@ function App() {
             setMode={setMode}
             alertMessage={alertMessage}
             setAlertMessage={setAlertMessage}
+            keepOutZones={keepOutZones}
           />
         </div>
         <div className="map-div">
@@ -30,9 +32,9 @@ function App() {
             geofences={geofences}
             setGeofences={setGeofences}
             mode={mode}
-            setMode={setMode}
-            alertMessage={alertMessage}
             setAlertMessage={setAlertMessage}
+            keepOutZones={keepOutZones}
+            setKeepOutZones={setKeepOutZones}
           />
         </div>
       </div>

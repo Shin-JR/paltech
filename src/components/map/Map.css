@@ -4,5 +4,5 @@
   margin: 1rem auto;
   max-width: 1200px;
   max-height: 800px;
-  border: 1px solid whitesmoke; 
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);  
 }

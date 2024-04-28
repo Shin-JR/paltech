@@ -1,10 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useState } from "react";
 import "./Sidebar.css";
-const Modes = Object.freeze({
-  GEOFENCES: 0,
-  MARKERS: 1,
-});
+import Modes from "../../config/Modes";
 
 export default function Sidebar({
   markers,
@@ -14,30 +11,37 @@ export default function Sidebar({
   setMode,
   alertMessage,
   setAlertMessage,
+  keepOutZones,
 }) {
-  const [markersToggled, setMarkersToggled] = useState(false);
-
   const handleGeofenceButtonAction = () => {
-    setMarkersToggled(false);
     setMode(Modes.GEOFENCES);
     setAlertMessage("Add a geofence!");
   };
   const handleMarkerButtonAction = () => {
-    setMarkersToggled(true);
     setMode(Modes.MARKERS);
     setAlertMessage("Add a marker!");
   };
-  const handleDeleteMarkers = () => {
+  const handleKeepOutZoneButtonAction = () => {
+    setMode(Modes.KEEP_OUT_ZONES);
+    setAlertMessage("Add a keep out zone!");
+  };
+  const handleDeleteAllMarkers = () => {
     setMarkers([]);
+    setMode(Modes.MARKERS);
     setAlertMessage("Markers Deleted!");
+  };
+  const handleRemoveMarkerButtonAction = () => {
+    setMode(Modes.DELETE_MARKERS);
+    setAlertMessage("Remove a marker!");
   };
 
   const downloadFile = ({ fileName, fileType }) => {
     const data = {
-        geofences: geofences,
-        markers: markers,
+      geofences: geofences,
+      markers: markers,
+      keepOutZones: keepOutZones,
     };
-    const json = JSON.stringify(data);
+    const json = JSON.stringify(data, null, 2);
     const blob = new Blob([json], {
       type: fileType,
     });
@@ -56,8 +60,6 @@ export default function Sidebar({
   const exportToJson = (e) => {
     e.preventDefault();
     downloadFile({
-      markers: { a: 0, b: 2 },
-      geofences: JSON.stringify(geofences),
       fileName: "paltech.json",
       fileType: "text/json",
     });
@@ -65,33 +67,83 @@ export default function Sidebar({
 
   return (
     <>
-      {/* <p>
-        {JSON.stringify(geofences, null, 2)}
-      </p> */}
+      <p>{mode}</p>
+      <p>{JSON.stringify(markers, null, 2)}</p>
       <h2>GeoFences & Markers</h2>
       <h3>Mode: {mode === Modes.MARKERS ? "Markers" : "Geofences"}</h3>
       <div className="button-container">
         <div className="mode-buttons-container">
           <button
             className={`add-markers-button ${
-              !markersToggled ? "add-markers-button-active" : ""
+              (mode === Modes.GEOFENCES || mode === Modes.KEEP_OUT_ZONES)
+                ? "add-markers-button-active"
+                : ""
             }`}
             onClick={handleGeofenceButtonAction}
           >
-            Add Geofences
+            Handle Geofences
           </button>
           <button
             className={`add-markers-button ${
-              markersToggled ? "add-markers-button-active" : ""
+              (mode === Modes.MARKERS || mode === Modes.DELETE_MARKERS) ? "add-markers-button-active" : ""
             }`}
             onClick={handleMarkerButtonAction}
           >
-            Add Markers
+            Handle Markers
           </button>
+          {(mode === Modes.GEOFENCES || mode === Modes.KEEP_OUT_ZONES) && (
+            <div className="geofence-menu">
+              <button
+                className={`add-keepoutzones-button ${
+                  mode === Modes.GEOFENCES
+                    ? "add-keepoutzones-button-active"
+                    : ""
+                }`}
+                onClick={handleGeofenceButtonAction}
+              >
+                Add stardard Geofence
+              </button>
+              <button
+                className={`add-keepoutzones-button ${
+                  mode === Modes.KEEP_OUT_ZONES
+                    ? "add-keepoutzones-button-active"
+                    : ""
+                }`}
+                onClick={handleKeepOutZoneButtonAction}
+              >
+                Add Keep Out Zone
+              </button>
+            </div>
+          )}
+          {(mode === Modes.MARKERS || mode === Modes.DELETE_MARKERS) && (
+            <div className="geofence-menu">
+              <button
+                className={`add-keepoutzones-button ${
+                  mode === Modes.MARKERS ? "add-keepoutzones-button-active" : ""
+                }`}
+                onClick={handleMarkerButtonAction}
+              >
+                Add a marker
+              </button>
+              <button
+                className={`add-keepoutzones-button ${
+                  mode === Modes.DELETE_MARKERS
+                    ? "add-keepoutzones-button-active"
+                    : ""
+                }`}
+                onClick={handleRemoveMarkerButtonAction}
+              >
+                Remove a marker
+              </button>
+              <button
+                className="delete-markers-button"
+                onClick={handleDeleteAllMarkers}
+              >
+                Remove All Markers
+              </button>
+            </div>
+          )}
         </div>
-        <button className="delete-markers-button" onClick={handleDeleteMarkers}>
-          Delete Markers
-        </button>
       </div>
       {alertMessage && <div className="alert-message">{alertMessage}</div>}
       {/* <p>

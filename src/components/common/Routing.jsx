@@ -13,7 +13,7 @@ export default function Routing() {
         <Routes>
           <Route path="/" element={<App />} />
           <Route path="/answers" element={<Answers />} />
-          <Route path="/howto" element={<HowTo />} />
+          <Route path="/howtouse" element={<HowTo />} />
         </Routes>
       </BrowserRouter>
     </>

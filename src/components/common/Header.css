@@ -1,5 +1,5 @@
 .header {
-  background-color: whitesmoke;
+  background-color: #517330;
   padding: 1rem 2rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   /* position: sticky; */
@@ -9,7 +9,7 @@
 }
 
 .container {
-  max-width: 90%;
+  max-width: 85%;
   margin: 0 auto;
 }
 
@@ -26,12 +26,15 @@
 
 .nav {
   display: flex;
+  padding: 1rem 0;
+  color: whitesmoke;
 }
 
 .nav-link {
   margin-right: 1rem;
+  margin-left: 1rem;
   text-decoration: none;
-  color: #333333;
+  color: whitesmoke;
 }
 
 .nav-link:hover {
