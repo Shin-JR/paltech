@@ -4,8 +4,7 @@ import "./HowTo.css";
 function HowToUse() {
   return (
     <div className="main-container">
-      <h1>Alooo</h1>
-      {/* <div className="howtouse-main-container">
+      <div className="howtouse-main-container">
         <h1 className="howtouse-title">
           Welcome to the GeoFences & Markers Web App Tutorial!
         </h1>
@@ -69,7 +68,7 @@ function HowToUse() {
           GeoFences & Markers web app. Feel free to explore additional features
           and functionalities on your own.
         </p>
-      </div> */}
+      </div>
     </div>
   );
 }

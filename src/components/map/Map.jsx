@@ -52,7 +52,7 @@ export default function Map({
   keepOutZones,
   setKeepOutZones,
 }) {
-  const center = [47.736008114450414, 10.32336067054073];
+  const center = [47.73600, 10.32336];
   const [prevSelectedGeofence, setPrevSelectedGeofence] = useState(null);
   const [geofenceColor, setGeofenceColor] = useState(Colors.GEOFENCES);
   const featureGroupRef = useRef();
