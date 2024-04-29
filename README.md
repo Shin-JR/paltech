@@ -1,7 +1,5 @@
 # PALTECH WEB APP
 
-Aplicación Web diseñada para posicionar geofences y marcas en un mapa.
-
 ## DEMO:
 
 [Paltech Web App](https://paltech-test.netlify.app/)
