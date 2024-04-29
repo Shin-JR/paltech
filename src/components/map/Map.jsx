@@ -242,7 +242,7 @@ export default function Map({
           }
         } else if (mode === Modes.GEOFENCES || mode === Modes.KEEP_OUT_ZONES) {
           const clickCoords = [e.latlng.lat, e.latlng.lng];
-          if (mode === Modes.GEOFENCES) {
+          if (mode === Modes.GEOFENCES || mode === Modes.KEEP_OUT_ZONES) {
             const { _layers } = featureGroupRef.current;
             const geofencesArray = [];
             Object.values(_layers).forEach((layer) => {
