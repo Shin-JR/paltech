@@ -50,7 +50,9 @@ function HowToUse() {
               To add a geofence, click on the "Handle Geofences" button on the
               sidebar. Then, click on the pentagon icon to start setting the
               vertices of your geofence on the map. Once you've created the
-              desired shape, the geofence will be displayed on the map.
+              desired shape, the geofence will be displayed on the map. You can
+              highlight a geofence by clicking on it while in 'Handle Geofences'
+              mode.
             </p>
             <img
               src="examples/add-geofences.jpg"

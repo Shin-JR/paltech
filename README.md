@@ -32,6 +32,11 @@ pnpm install
 pnpm run dev
 ```
 
+## Assumptions
+
+- The markers can be added in every enabled geofence, not necessarily the selected one. It gives the user flexibility to add markers faster.
+- The application does not have a standalone simulation feature. Instead, the simulation itself occurs within the home view of the app.
+
 ## Concept Questions
 
 ### What approach would you use to maintain the described functionalities offline (e.g. display the map)?
